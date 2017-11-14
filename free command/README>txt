@@ -1,0 +1,103 @@
+Implement "free" command on xv6
+
+Step 1 : 
+	vi syscall.h
+	Add #define SYS_freeMem 22 at the bottom of the file
+
+Step 2 : 
+	vi defs.h
+	Add the function prototype to this header file.
+	Under kalloc.c, add -
+	void freeMem(void);
+
+Step 3:
+	vi user.h
+	Add the function prototype.
+	void freeMem(void);
+
+Step 4:
+	vi sysproc.c
+	Adding the function call.
+	void
+	sys_freeMem(void)
+	{
+  		freeMem();
+	}
+
+Step 5:
+	vi usys.S
+	Add the following at the bottom.
+	SYSCALL(freeMem)
+
+Step 6:
+	Add the function to syscall.c
+	extern int sys_freeMem(void);
+	[SYS_freeMem]    sys_freeMem,
+
+Step 7:
+	vi kalloc.c
+	Add the approach there.
+	> Declare two variables 
+		int freeMemCount = 0;
+		int usedMemCount = 0; globally
+
+	> In kinit1 
+		freeMemCount = freeMemCount + (vend - vstart)/PGSIZE;
+
+	> In kinit2
+		 freeMemCount = freeMemCount + (vend - vstart)/PGSIZE;
+  		 usedMemCount = 0;
+
+  	> In kfree
+  		freeMemCount = freeMemCount + 1;
+  		usedMemCount = usedMemCount - 1;
+
+  	> In kalloc
+  		freeMemCount = freeMemCount - 1;
+  		usedMemCount = usedMemCount + 1;
+
+  	> Add the function freeMem in the end
+  		void 
+		freeMem()
+		{
+  			cprintf("Free  Used \n");
+  			cprintf("%d  %d", freeMemCount, usedMemCount);
+		}
+
+Step 8:
+	Create a new file
+
+	vi freeMem.c
+
+	#include "types.h"
+	#include "stat.h"
+	#include "user.h"
+	#include "fcntl.h"
+
+	int main(int argc ,char *argv[])
+	{
+		freeMem();
+		exit();
+	}
+
+	//calls the system call "free"
+
+Step 9:
+	Modify the Makefile
+
+	vi Makefile
+
+	Under UPROGS=\ add _freeMem\ before _wc\
+	Under EXTRA=\ add freeMem.c before wc.c
+
+Step 10:
+	make qemu
+	No Errors!
+
+Step 11:
+	Type "ls" on the console.
+	It is seen that "freeMem" has been added to the system.
+
+Step 12:
+	Type freeMem on the console. 
+	It displays the Free and Used Memory.
