@@ -107,6 +107,13 @@ kalloc(void)
 void 
 freeMem()
 {
-  cprintf("Free  Used \n");
-  cprintf("%d  %d", freeMemCount, usedMemCount);
+cnt = 0;  
+  struct run *r;
+  r = kmem.freelist;
+  while((r = r->next))
+  cnt++;
+  //cprintf("Count is %d",cnt); 
+  total = cnt + usedMemCount;
+ cprintf("Free  Used Total\n");
+ cprintf("%d  %d %d \n", cnt*PGSIZE, usedMemCount*PGSIZE, total*PGSIZE);
 }
