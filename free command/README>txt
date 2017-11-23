@@ -45,7 +45,7 @@ Step 7:
 		freeMemCount = freeMemCount + (vend - vstart)/PGSIZE;
 
 	> In kinit2
-		 freeMemCount = freeMemCount + (vend - vstart)/PGSIZE;
+		 //freeMemCount = freeMemCount + (vend - vstart)/PGSIZE; //no need to do this because kinit2 only maps the pages to the memory. Allocation is only done by kinit1.
   		 usedMemCount = 0;
 
   	> In kfree
@@ -60,8 +60,15 @@ Step 7:
   		void 
 		freeMem()
 		{
-  			cprintf("Free  Used \n");
-  			cprintf("%d  %d", freeMemCount, usedMemCount);
+  			cnt = 0;  
+  			struct run *r;
+  			r = kmem.freelist;
+  			while((r = r->next))
+  			cnt++;
+  			//cprintf("Count is %d",cnt); 
+  			total = cnt + usedMemCount;
+ 			cprintf("Free  Used Total\n");
+ 			cprintf("%d  %d %d \n", cnt*PGSIZE, usedMemCount*PGSIZE, total*PGSIZE);
 		}
 
 Step 8:
